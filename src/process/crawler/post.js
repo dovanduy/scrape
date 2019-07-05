@@ -71,7 +71,6 @@ const { checkUnique } = require( "../../helpers/utils/functions/array" ),
     return listPost ;
   };
 
-
 ( async () => {
   // eslint-disable-next-line no-new
   new CronJob( "1 * * * * *", async function() {
