@@ -7,6 +7,8 @@ Object.defineProperty( Array.prototype, "flat", {
   }
 } );
 
+let checkCondition = true;
+
 const { checkUnique } = require( "../../helpers/utils/functions/array" ),
   { searchPostPublic } = require( "../../networks/facebook/search/post" ),
   request = require( "axios" ),
@@ -14,9 +16,8 @@ const { checkUnique } = require( "../../helpers/utils/functions/array" ),
 
   // Function handle crawl post facebook
   crawlPostFacebook = async ( infoCrawl ) => {
-
     // remove duplicate keywords
-    infoCrawl.keywords = [ ...new Set( infoCrawl.keywords ) ];
+    infoCrawl.keywords = [ ...new Set( infoCrawl.keywords ) ] ;
 
     // Handle search on facebook and get info feed/ post
     let listPost = await Promise.all( infoCrawl.keywords.map( async ( keyword ) => {
@@ -29,7 +30,6 @@ const { checkUnique } = require( "../../helpers/utils/functions/array" ),
         "keyword": keyword,
         "number": 100
       } );
-
       // Remove post no content
       listPostByKeyword = listPostByKeyword.filter( ( post ) => post.postID.includes( "photos" ) === false ).filter( ( post ) => post.content !== "" || post.content !== null || post.content !== undefined );
 
@@ -71,6 +71,19 @@ const { checkUnique } = require( "../../helpers/utils/functions/array" ),
     return listPost ;
   };
 
+// eslint-disable-next-line func-style
+function recursiveKeywords ( arr, data, index ) {
+  if ( arr.length === 0 ) {
+    checkCondition = true;
+    return checkCondition;
+  }
+  checkCondition = false;
+  let result = crawlPostFacebook( { "keywords": arr.splice( 0, index ), "data": data } );
+
+  recursiveKeywords( arr, data, index );
+  return result;
+}
+
 
 ( async () => {
   // eslint-disable-next-line no-new
@@ -84,8 +97,12 @@ const { checkUnique } = require( "../../helpers/utils/functions/array" ),
       "url": `${process.env.APP_MAIN_URL}/api/v1/keywords/sync`
     } );
 
+    if ( checkCondition === false ) {
+      return false;
+    }
+
     console.log( "Thread 02: Starting request crawler to facebook!" );
-    dataResponseFromFacebook = await crawlPostFacebook( listInfoRes.data );
+    dataResponseFromFacebook = await recursiveKeywords( listInfoRes.data.keywords.reverse(), listInfoRes.data.data, 2 );
     console.log( "Thread 02: Finnish request crawler to facebook!" );
 
     console.log( dataResponseFromFacebook );

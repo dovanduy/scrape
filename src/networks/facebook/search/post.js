@@ -4,7 +4,7 @@ const cheerio = require( "cheerio" ),
   request = require( "request" ),
   { getDataTokenSign, getDataTokenSignAgent } = require( "../../../networks/facebook/token/datatokensign" ),
   { getPostByModalUrl, searchPostPublicUrl } = require( "../../../configs/facebook/scrape.url" ),
-  { convertUnicodeToCharacter, findSubString } = require( "../../../helpers/utils/functions/string" ),
+  { findSubString } = require( "../../../helpers/utils/functions/string" ),
   getPostInfoByModalAPI = ( { agent, cookie, storyToken, unicornStoryID } ) => {
     return new Promise( async ( resolve ) => {
       const option = {
