@@ -34,6 +34,11 @@ const cheerio = require( "cheerio" ),
               photos.push( $( this ).attr( "data-ploi" ) );
             } );
 
+          console.log( {
+            "content": htmlDecode( $( "div.userContent" ).html().replace( /(<br \/>)|(<br>)/gm, "\n" ).replace( /(<\/p>)|(<\/div>)/gm, "\n" ).replace( /(<([^>]+)>)/gm, "" ) ),
+            "photos": photos.filter( ( photo ) => photo !== undefined && photo !== null )
+          } );
+
           resolve( {
             "errors": {
               "code": 200,
